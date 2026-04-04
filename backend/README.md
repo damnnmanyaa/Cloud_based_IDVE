@@ -17,6 +17,16 @@ mvn spring-boot:run
 
 Backend starts on `http://localhost:8080`.
 
+## Environment Variables
+Create a local `.env` file in `backend` (already gitignored) and set:
+
+- `APP_JWT_SECRET` (required, use a long random value)
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GITHUB_CLIENT_ID`
+- `GITHUB_CLIENT_SECRET`
+- `OAUTH2_REDIRECT_URI` (default: `http://localhost:5173/login`)
+
 ## Auth APIs
 - `POST /api/auth/register`
   - body: `{ "name": "...", "email": "...", "password": "..." }`
