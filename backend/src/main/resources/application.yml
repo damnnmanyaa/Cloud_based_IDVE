@@ -1,0 +1,72 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:idve;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:replace-with-google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:replace-with-google-client-secret}
+            scope:
+              - email
+              - profile
+          github:
+            client-id: ${GITHUB_CLIENT_ID:replace-with-github-client-id}
+            client-secret: ${GITHUB_CLIENT_SECRET:replace-with-github-client-secret}
+            scope:
+              - read:user
+              - user:email
+
+# For MySQL, replace datasource with:
+# spring:
+#   datasource:
+#     url: jdbc:mysql://localhost:3306/idve_db
+#     username: root
+#     password: your_password
+#     driver-class-name: com.mysql.cj.jdbc.Driver
+#   jpa:
+#     hibernate:
+#       ddl-auto: update
+
+app:
+  jwt:
+    secret: 2ebf459a0a6a5162c6c0f33a7a15d14bf9682ac6f2045f5e9a9f3f5d84bd2f44
+    expiration-ms: 86400000
+  oauth2:
+    redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:5173/login}
+  otp:
+    dev-fallback-enabled: true
+  cors:
+    allowed-origins:
+      - http://localhost:3000
+      - http://localhost:5173
+      - http://localhost:5174
