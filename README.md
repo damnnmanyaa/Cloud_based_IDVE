@@ -74,11 +74,6 @@ Instead of just building a login system, I focused on IAM concepts:
 4. Admin reviews and approves/rejects  
 5. All actions are logged  
 
----
-
-## 📸 Screenshots
-
-(I’ll add screenshots here)
 
 ---
 
