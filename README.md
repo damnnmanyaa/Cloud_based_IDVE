@@ -1,18 +1,111 @@
-# React + Vite
+# 🔐 Identity Verification & Access Management System (IDVE)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Hey! This is my minor project where I tried to build a system that actually *controls who gets access* and *verifies if users are genuine* — not just a basic login/signup app.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 💡 Why I built this
 
-## React Compiler
+Most small applications allow users to sign up without any proper verification.  
+This can lead to:
+- Fake accounts  
+- Security risks  
+- No control over user access  
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+So I wanted to build something that:
+- Verifies user identity  
+- Controls access based on roles  
+- Tracks important actions  
 
-Note: This will impact Vite dev & build performances.
+Basically, a **mini IAM (Identity and Access Management) system**
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## ⚙️ What the system does
+
+### 👤 For Users:
+- Sign up using email (OTP verification included)
+- Login using email/password or Google/GitHub
+- Upload identity document
+- Check verification status (Pending / Verified / Rejected)
+
+### 👑 For Admin:
+- View all users
+- Approve or reject identity verification
+- See activity logs (who did what and when)
+
+---
+
+## 🔐 Core Concepts Used
+
+Instead of just building a login system, I focused on IAM concepts:
+
+- **Authentication** → JWT, OAuth, OTP  
+- **Authorization** → Role-based access (User/Admin)  
+- **Identity Verification** → Document upload + approval  
+- **Audit Logging** → Tracks system activity  
+
+---
+
+## 🛠️ Tech Stack
+
+**Frontend**
+- React (Vite)
+- Tailwind CSS
+- Axios
+
+**Backend**
+- Spring Boot
+- Spring Security
+- JWT
+- OAuth (Google & GitHub)
+- JavaMailSender (for OTP)
+
+**Database**
+- H2 (used for development)
+
+---
+
+## 🔄 How it works (flow)
+
+1. User signs up → verifies email using OTP  
+2. Logs in (email or OAuth)  
+3. Uploads identity document  
+4. Admin reviews and approves/rejects  
+5. All actions are logged  
+
+---
+
+## 📸 Screenshots
+
+(I’ll add screenshots here)
+
+---
+
+## ⚠️ Current Limitations
+
+- Using H2 database (data resets on restart)
+- Not deployed on cloud yet
+- Document verification is manual
+
+---
+
+## 🚀 Future Improvements
+
+- Switch to MySQL  
+- Deploy on cloud (AWS / Vercel)  
+- Add multi-factor authentication  
+- Improve UI/UX further  
+
+---
+
+## 🙋‍♂️ About Me
+
+This project is part of my B.Tech (3rd year) coursework.  
+I built this to understand how real systems handle identity and access.
+
+---
+
+## ⭐ If you like it
+
+Feel free to star the repo 🙂
