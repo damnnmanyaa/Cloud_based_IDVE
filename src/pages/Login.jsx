@@ -1,12 +1,43 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState("USER");
   const [oauthReady, setOauthReady] = useState({ google: false, github: false });
   const API_BASE = "http://localhost:8080";
+
+  const decodeRoleFromToken = (token) => {
+    try {
+      const claims = jwtDecode(token);
+      const rawRole =
+        claims?.role ||
+        (Array.isArray(claims?.roles) && claims.roles[0]) ||
+        (Array.isArray(claims?.authorities) && claims.authorities[0]) ||
+        "";
+
+      return String(rawRole).replace(/^ROLE_/i, "").toUpperCase();
+    } catch {
+      return "";
+    }
+  };
+
+  const redirectByRole = (token) => {
+    const role = decodeRoleFromToken(token);
+
+    if (role === "ADMIN") {
+      navigate("/admin", { replace: true });
+      return;
+    }
+
+    navigate("/dashboard", { replace: true });
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -14,8 +45,13 @@ export default function Login() {
     const oauthError = params.get("error");
 
     if (oauthToken) {
-      localStorage.setItem("token", oauthToken);
-      navigate("/dashboard");
+      const isLoggedIn = login(oauthToken);
+      if (isLoggedIn) {
+        redirectByRole(oauthToken);
+      } else {
+        alert("Login failed: invalid token returned by OAuth provider.");
+        navigate("/login", { replace: true });
+      }
       return;
     }
 
@@ -23,7 +59,7 @@ export default function Login() {
       alert("OAuth login failed: provider did not return a usable email.");
       navigate("/login", { replace: true });
     }
-  }, [navigate]);
+  }, [login, navigate]);
 
   useEffect(() => {
     const loadOAuthConfig = async () => {
@@ -77,11 +113,20 @@ export default function Login() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, role }),
       });
 
       if (!res.ok) {
         const errorMessage = await getErrorMessage(res, "Login failed");
+
+        if (
+          res.status === 404 ||
+          /not registered|not found|user does not exist/i.test(errorMessage)
+        ) {
+          alert("User is not registered. Please sign up first.");
+          return;
+        }
+
         alert(errorMessage);
         return;
       }
@@ -89,8 +134,13 @@ export default function Login() {
       const data = await res.json();
 
       if (data.token) {
-        localStorage.setItem("token", data.token);
-        navigate("/dashboard");
+        const isLoggedIn = login(data.token);
+        if (!isLoggedIn) {
+          alert("Login failed: invalid token returned by backend");
+          return;
+        }
+
+        redirectByRole(data.token);
       } else {
         alert("Login failed: token missing in response");
       }
@@ -136,13 +186,35 @@ export default function Login() {
             <label>Password</label>
             <span className="text-gray-500 cursor-pointer">Forgot?</span>
           </div>
-          <input
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full mt-1 px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-gray-300"
-          />
+          <div className="relative mt-1">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 pr-14 border rounded-lg outline-none focus:ring-2 focus:ring-gray-300"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 text-xs font-medium text-gray-700 bg-white/90 px-2 py-1 rounded-md hover:bg-gray-100"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label className="text-sm text-gray-700">Login as</label>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-full mt-1 px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-gray-300 bg-white"
+          >
+            <option value="USER">User</option>
+            <option value="ADMIN">Admin</option>
+          </select>
         </div>
 
         {/* Sign in button */}
