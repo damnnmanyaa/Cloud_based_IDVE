@@ -20,6 +20,8 @@ public class VerifyOtpRequest {
     @Pattern(regexp = "\\d{6}", message = "OTP must be 6 digits")
     private String otp;
 
+    private String role;
+
     public String getName() {
         return name;
     }
@@ -50,5 +52,13 @@ public class VerifyOtpRequest {
 
     public void setOtp(String otp) {
         this.otp = otp;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

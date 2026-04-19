@@ -7,6 +7,10 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
@@ -64,7 +68,7 @@ app:
   oauth2:
     redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:5173/login}
   otp:
-    dev-fallback-enabled: true
+    dev-fallback-enabled: false
   cors:
     allowed-origins:
       - http://localhost:3000

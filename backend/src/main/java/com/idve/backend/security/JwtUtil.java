@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
+import java.util.List;
 import java.util.Date;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,11 +22,18 @@ public class JwtUtil {
     private long jwtExpirationMs;
 
     public String generateToken(String username) {
+        return generateToken(username, "USER");
+    }
+
+    public String generateToken(String username, String role) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationMs);
+        String normalizedRole = (role == null || role.isBlank()) ? "USER" : role.toUpperCase();
 
         return Jwts.builder()
             .subject(username)
+            .claim("role", normalizedRole)
+            .claim("authorities", List.of("ROLE_" + normalizedRole))
             .issuedAt(now)
             .expiration(expiry)
             .signWith(getSigningKey())

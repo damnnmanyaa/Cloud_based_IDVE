@@ -51,9 +51,11 @@ public class AuthService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(normalizeRole(request.getRole()));
+        user.setVerificationStatus("PENDING");
         User saved = userRepository.save(user);
 
-        String token = jwtUtil.generateToken(saved.getEmail());
+        String token = jwtUtil.generateToken(saved.getEmail(), saved.getRole());
         return new AuthResponse(token);
     }
 
@@ -66,9 +68,11 @@ public class AuthService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole("USER");
+        user.setVerificationStatus("PENDING");
 
         User saved = userRepository.save(user);
-        return new UserResponse(saved.getId(), saved.getName(), saved.getEmail());
+        return new UserResponse(saved.getId(), saved.getName(), saved.getEmail(), saved.getRole(), saved.getVerificationStatus());
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -79,7 +83,15 @@ public class AuthService {
             throw new UnauthorizedException("Invalid email or password");
         }
 
-        String token = jwtUtil.generateToken(user.getEmail());
+        String role = normalizeRole(user.getRole());
+        if (request.getRole() != null && !request.getRole().isBlank()) {
+            String selectedRole = normalizeRole(request.getRole());
+            if (!selectedRole.equals(role)) {
+                throw new UnauthorizedException("Selected login type does not match your account role");
+            }
+        }
+
+        String token = jwtUtil.generateToken(user.getEmail(), role);
         return new AuthResponse(token);
     }
 
@@ -87,7 +99,8 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
             .orElseGet(() -> createOAuthUser(email, displayName));
 
-        return jwtUtil.generateToken(user.getEmail());
+        String role = (user.getRole() == null || user.getRole().isBlank()) ? "USER" : user.getRole();
+        return jwtUtil.generateToken(user.getEmail(), role);
     }
 
     private User createOAuthUser(String email, String displayName) {
@@ -96,6 +109,17 @@ public class AuthService {
         user.setName((displayName == null || displayName.isBlank()) ? email : displayName);
         // Random encoded password keeps schema compatibility for OAuth-only users.
         user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+        user.setRole("USER");
+        user.setVerificationStatus("PENDING");
         return userRepository.save(user);
+    }
+
+    private String normalizeRole(String role) {
+        if (role == null || role.isBlank()) {
+            return "USER";
+        }
+
+        String normalized = role.toUpperCase().replace("ROLE_", "");
+        return "ADMIN".equals(normalized) ? "ADMIN" : "USER";
     }
 }

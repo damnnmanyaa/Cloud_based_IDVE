@@ -95,6 +95,7 @@ export default function InputOTPForm({ email, onVerify, onResend, initialOtp = "
     setIsResending(true);
     setError("");
     setInfo("");
+    setOtp("");
     try {
       await onResend();
       setInfo("OTP sent successfully");
@@ -139,7 +140,7 @@ export default function InputOTPForm({ email, onVerify, onResend, initialOtp = "
             <button
               onClick={handleResend}
               disabled={isResending}
-              className="px-4 py-2 border border-gray-300 rounded-xl text-2xl font-semibold disabled:opacity-60"
+              className="px-4 py-2 border border-gray-300 rounded-xl text-2xl font-semibold transition hover:bg-gray-100 disabled:opacity-60"
             >
               {isResending ? "Resending..." : "Resend Code"}
             </button>
@@ -161,19 +162,13 @@ export default function InputOTPForm({ email, onVerify, onResend, initialOtp = "
             </div>
           </div>
 
-          <button
-            type="button"
-            className="text-gray-600 underline text-2xl mb-4"
-          >
-            I no longer have access to this email address.
-          </button>
         </div>
 
         <div className="border-t border-gray-200 p-6">
           <button
             onClick={handleVerify}
             disabled={isVerifying}
-            className="w-full h-14 bg-black text-white text-3xl rounded-2xl font-semibold disabled:opacity-60"
+            className="w-full h-14 bg-black text-white text-3xl rounded-2xl font-semibold transition hover:opacity-90 disabled:opacity-60"
           >
             {isVerifying ? "Verifying..." : "Verify"}
           </button>
