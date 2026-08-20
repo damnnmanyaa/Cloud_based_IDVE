@@ -62,7 +62,7 @@ Instead of just building a login system, I focused on IAM concepts:
 - JavaMailSender (for OTP)
 
 **Database**
-- H2 (used for development)
+- PostgreSQL (runtime), H2 (test only)
 
 ---
 
@@ -79,7 +79,6 @@ Instead of just building a login system, I focused on IAM concepts:
 
 ## ⚠️ Current Limitations
 
-- Using H2 database (data resets on restart)
 - Not deployed on cloud yet
 - Document verification is manual
 
@@ -87,10 +86,9 @@ Instead of just building a login system, I focused on IAM concepts:
 
 ## 🚀 Future Improvements
 
-- Switch to MySQL  
-- Deploy on cloud (AWS / Vercel)  
-- Add multi-factor authentication  
-- Improve UI/UX further  
+- Deploy on cloud (AWS / Vercel / Flatcar VM)
+- Add multi-factor authentication
+- Improve UI/UX further
 
 ---
 

@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,12 +19,14 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class DocumentUploadService {
 
-    private static final String UPLOADS_DIR = "uploads";
+    private final Path uploadRoot;
 
     private final UserRepository userRepository;
 
-    public DocumentUploadService(UserRepository userRepository) {
+    public DocumentUploadService(@Value("${app.uploads.path:backend/uploads}") String uploadsPath,
+                                 UserRepository userRepository) {
         this.userRepository = userRepository;
+        this.uploadRoot = Paths.get(uploadsPath).toAbsolutePath().normalize();
     }
 
     @Transactional
@@ -35,7 +38,6 @@ public class DocumentUploadService {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new BadRequestException("User not found"));
 
-        Path uploadRoot = Paths.get(UPLOADS_DIR).toAbsolutePath().normalize();
         String extension = extractExtension(file.getOriginalFilename());
         String uniqueName = UUID.randomUUID() + extension;
         Path destination = uploadRoot.resolve(uniqueName).normalize();
@@ -53,7 +55,8 @@ public class DocumentUploadService {
             throw new RuntimeException("Failed to store uploaded file", ex);
         }
 
-        String relativePath = UPLOADS_DIR + "/" + uniqueName;
+        // store a repo-root-relative path for the database so frontend can fetch it when served by backend
+        String relativePath = uploadRoot.getFileName().toString() + "/" + uniqueName;
         user.setDocumentPath(relativePath);
         user.setVerificationStatus("PENDING");
         return userRepository.save(user);

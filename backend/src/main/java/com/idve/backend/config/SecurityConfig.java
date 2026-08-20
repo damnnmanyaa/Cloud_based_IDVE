@@ -47,7 +47,7 @@ public class SecurityConfig {
             .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthEntryPoint))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/auth/**", "/oauth2/**", "/login/oauth2/**", "/h2-console/**").permitAll()
+                .requestMatchers("/api/auth/**", "/oauth2/**", "/login/oauth2/**").permitAll()
                 .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 -> oauth2
@@ -55,9 +55,6 @@ public class SecurityConfig {
             )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        // Required for H2 console in browser frame.
-        http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
     }

@@ -1,0 +1,56 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.H2Dialect
+  mail:
+    host: localhost
+    port: 3025
+    username: test@example.com
+    password: test
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 1000
+          timeout: 1000
+          writetimeout: 1000
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-google-id
+            client-secret: test-google-secret
+          github:
+            client-id: test-github-id
+            client-secret: test-github-secret
+
+app:
+  jwt:
+    secret: test-jwt-secret-for-testing-only-not-for-production
+    expiration-ms: 3600000
+  oauth2:
+    redirect-uri: http://localhost:5173/login
+  otp:
+    dev-fallback-enabled: true
+  cors:
+    allowed-origins:
+      - http://localhost:5173
+  uploads:
+    path: target/test-uploads
